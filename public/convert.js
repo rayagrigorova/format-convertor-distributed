@@ -876,3 +876,8 @@
     },
   };
 })(typeof window !== "undefined" ? window : global);
+
+// ---- Node compatibility export ----
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = DataTransformer;
+}

@@ -33,11 +33,47 @@ const SAMPLE_JSON = `{
   }
 }`;
 
+// This way in manual mode the user will see engine=local and can switch to engine=rpc without new buttons
 const DEFAULT_SETTINGS_TEXT = `inputformat=json
 outputformat=yaml
+engine=local
 savetohistory=false
 align=true
 case=none`;
+
+function getSettingValue(settingsText, key) {
+  const lines = (settingsText || "").split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const idx = trimmed.indexOf("=");
+    if (idx === -1) continue;
+    const k = trimmed.slice(0, idx).trim();
+    const v = trimmed.slice(idx + 1).trim();
+    if (k === key) return v;
+  }
+  return null;
+}
+
+function stripEngineSetting(settingsText) {
+  return (settingsText || "")
+    .split("\n")
+    .filter((line) => !/^\s*engine\s*=/i.test(line))
+    .join("\n");
+}
+
+async function convertViaRpc(inputString, settingsStringWithoutEngine) {
+  const data = await api("convert_rpc.php", {
+    method: "POST",
+    body: JSON.stringify({
+      inputString,
+      settingsString: settingsStringWithoutEngine,
+    }),
+  });
+
+  if (!data.ok) throw new Error(data.error || "RPC convert failed");
+  return data.output;
+}
 
 // Input/output fields
 const inputField = document.getElementById("input-field");
@@ -121,10 +157,31 @@ window.initApp = function initApp() {
       '<i class="fas fa-spinner fa-spin"></i> Обработва се...';
     transformBtn.disabled = true;
 
-    // Try to transform
+    // Try to transform (local or RPC)
     let result, meta;
     try {
-      ({ result, meta } = await DataTransformer.convert(input, settingsString));
+      const engine = (
+        getSettingValue(settingsString, "engine") || "local"
+      ).toLowerCase();
+      const transformerSettings = stripEngineSetting(settingsString); // <- ВАЖНО
+
+      if (engine === "rpc") {
+        result = await convertViaRpc(input, transformerSettings);
+
+        // meta е нужно за save/history – извличаме го от settings
+        const inMatch = transformerSettings.match(/inputformat=(\w+)/i);
+        const outMatch = transformerSettings.match(/outputformat=(\w+)/i);
+        meta = {
+          inFmt: inMatch ? inMatch[1].toLowerCase() : "auto",
+          outFmt: outMatch ? outMatch[1].toLowerCase() : "unknown",
+        };
+      } else {
+        ({ result, meta } = await DataTransformer.convert(
+          input,
+          transformerSettings
+        ));
+      }
+
       outputField.value = result;
     } catch (err) {
       outputField.value = "⚠️ Грешка при трансформация:\n" + err.message;
