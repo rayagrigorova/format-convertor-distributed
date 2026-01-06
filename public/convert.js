@@ -573,7 +573,7 @@
     }
 
     const obj = {};
-    node.childNodes.forEach((child) => {
+    Array.from(node.childNodes || []).forEach((child) => {
       const val = xmlNodeToJSON(child);
       if (val === "") return; // ignore empty text nodes
       const tag = child.nodeName;

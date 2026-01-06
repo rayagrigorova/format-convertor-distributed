@@ -47,6 +47,25 @@ if (!isset($rpc['result']['output'])) {
   exit;
 }
 
+$rpc = json_decode($response, true);
+
+if (isset($rpc['error'])) {
+  http_response_code(500);
+  $msg = $rpc['error']['data']['message'] ?? $rpc['error']['message'] ?? 'RPC error';
+  echo json_encode([
+    "ok" => false,
+    "error" => $msg,
+    "rpc" => $rpc
+  ]);
+  exit;
+}
+
+if (!isset($rpc['result']['output'])) {
+  http_response_code(500);
+  echo json_encode(["ok" => false, "error" => "Bad RPC response", "rpc" => $rpc]);
+  exit;
+}
+
 echo json_encode([
   "ok" => true,
   "debug_rpc" => $rpc,  // <-- временно за дебъг

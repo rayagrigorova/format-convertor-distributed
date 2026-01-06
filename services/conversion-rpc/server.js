@@ -53,11 +53,20 @@ app.post("/rpc", async (req, res) => {
       let inputString = params?.inputString ?? "";
       let settingsString = params?.settingsString ?? "";
 
-      // Normalize Windows newlines + strip BOM (common copy/paste issue)
-      inputString = String(inputString).replace(/^\uFEFF/, "");
-      settingsString = String(settingsString)
-        .replace(/^\uFEFF/, "")
-        .replace(/\r\n/g, "\n");
+      console.log(
+        "FIRST CHAR CODE (raw):",
+        String(params?.inputString ?? "").charCodeAt(0)
+      );
+
+      // Normalize + remove invisible chars that break XML detection/parsing
+      const clean = (s) =>
+        String(s || "")
+          .replace(/\r\n/g, "\n")
+          .replace(/[\uFEFF\u200B\u00A0]/g, "") // BOM, zero-width, NBSP anywhere
+          .trimStart(); // important: make '<' be first visible char
+
+      inputString = clean(inputString);
+      settingsString = clean(settingsString);
 
       console.log(
         "FIRST CHAR CODE:",
