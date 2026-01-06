@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="bg">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Page title -->
+    <title>Format Convertor</title>
+
+    <!-- FontAwesome for icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Inter font from Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <div class="header-content">
+          <!-- App logo with icon -->
+          <div class="logo">
+            <i class="fas fa-exchange-alt logo-icon"></i>
+            <span>Format Convertor</span>
+          </div>
+
+          <!-- User actions: email display and logout button -->
+          <div class="user-actions">
+            <span id="current-user" class="user-email"></span>
+            <button id="logout-btn" class="btn btn-outline">
+              <i class="fas fa-sign-out-alt"></i> Изход
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <div class="toolbar">
+          <h1 class="toolbar-title">Инструмент за трансформация на данни</h1>
+          <div class="toolbar-actions">
+            <button class="btn btn-outline">
+              <i class="fas fa-history"></i> История
+            </button>
+            <button class="btn btn-outline">
+              <i class="fas fa-bookmark"></i> Шаблони
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab navigation -->
+        <div class="tabs">
+          <div class="tab active">Трансформатор</div>
+          <div class="tab">История</div>
+          <div class="tab">Помощ</div>
+        </div>
+
+        <!-- Main transform tab: input, output, settings, and action buttons -->
+        <div class="tab-content active" id="transform-tab">
+          <div class="editor-panel">
+            <!-- Input editor -->
+            <div class="editor-container">
+              <div class="editor-header">
+                <div class="editor-title"><i class="fas fa-code"></i> Вход</div>
+              </div>
+
+              <div class="editor-body">
+                <textarea
+                  id="input-field"
+                  class="code-editor"
+                  placeholder="Въведете входните данни тук..."
+                ></textarea>
+
+                <!-- File upload interface -->
+                <div class="file-upload-wrapper">
+                  <div class="file-upload-actions">
+                    <label for="file-upload" class="file-upload-label">
+                      <i class="fas fa-upload"></i> Качи файл
+                    </label>
+                    <input type="file" id="file-upload" />
+
+                    <!-- Display selected file name and delete button -->
+                    <div class="file-info" style="display: none">
+                      <span id="file-name"></span>
+                      <button id="remove-file-btn">
+                        <i class="fas fa-trash-alt"></i> Изтрий
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Output editor -->
+            <div class="editor-container">
+              <div class="editor-header">
+                <div class="editor-title">
+                  <i class="fas fa-file-code"></i> Изход
+                </div>
+              </div>
+
+              <div class="editor-body">
+                <textarea
+                  id="output-field"
+                  class="code-editor"
+                  readonly
+                  placeholder="Трансформираният изход ще се появи тук..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-panel">
+            <div class="settings-header">
+              <i class="fas fa-sliders-h"></i> Настройки за трансформация
+            </div>
+
+            <div class="settings-body">
+              <!-- Format mode selector -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="radio-label">
+                    <input
+                      type="radio"
+                      name="format-mode"
+                      value="dropdown"
+                      checked
+                    />
+                    Изберете формати от падащо меню
+                  </label>
+                  <label class="radio-label">
+                    <input type="radio" name="format-mode" value="manual" />
+                    Ръчно въвеждане на формати
+                  </label>
+                </div>
+              </div>
+
+              <!-- Dropdown selectors -->
+              <div id="dropdown-formats-container">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label class="form-label">Входен формат</label>
+                    <select id="input-format-select" class="form-control">
+                      <option>JSON</option>
+                      <option>YAML</option>
+                      <option>XML</option>
+                      <option>CSV</option>
+                      <option>Emmet</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Изходен формат</label>
+                    <select id="output-format-select" class="form-control">
+                      <option>YAML</option>
+                      <option>JSON</option>
+                      <option>XML</option>
+                      <option>CSV</option>
+                      <option>Emmet</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Manual input settings -->
+              <div
+                id="manual-format-container"
+                class="form-group"
+                style="display: none"
+              >
+                <label class="form-label"
+                  >Ръчно въвеждане на настройки (key=value pairs)</label
+                >
+                <textarea
+                  id="manual-format-field"
+                  class="form-control"
+                  rows="6"
+                  placeholder="Въведете настройките тук..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action buttons: reset, save, transform -->
+          <div class="action-bar">
+            <button class="btn btn-outline">
+              <i class="fas fa-redo"></i> Нулиране
+            </button>
+            <button
+              id="save-history-btn"
+              class="btn btn-primary btn-lg"
+              title="Запази тази трансформация в историята"
+            >
+              <i class="fas fa-save"></i> Запази в историята
+            </button>
+            <button id="transform-btn" class="btn btn-primary btn-lg">
+              <i class="fas fa-bolt"></i> Трансформирай
+            </button>
+          </div>
+        </div>
+
+        <!-- Saved transformation history -->
+        <div class="tab-content" id="history-tab">
+          <div id="history-container" class="history-panel"></div>
+        </div>
+
+        <!-- Help / Settings reference -->
+        <div class="tab-content" id="help-tab">
+          <article class="help-panel">
+            <header class="help-header">
+              <i class="fas fa-question-circle"></i>
+              <h2>Помощ / Настройки на трансформацията</h2>
+            </header>
+            <!-- Quick overview, options, replacements, example configuration -->
+            <section class="help-section">
+              <h3><i class="fas fa-info-circle"></i> Как работи</h3>
+              <p>
+                Полето <strong>Настройки</strong> (key=value) ви дава пълен
+                контрол върху преобразуването – формат, подравняване,
+                преименуване на тагове и др. Най-честите параметри са събрани в
+                таблицата по-долу.
+              </p>
+            </section>
+
+            <section class="help-section">
+              <h3><i class="fas fa-sliders-h"></i> Основни опции</h3>
+
+              <ul class="help-list">
+                <li>
+                  <span class="key">inputformat</span>
+                  <code class="value"
+                    >json | yaml | xml | csv | emmet | auto</code
+                  >
+                </li>
+                <li>
+                  <span class="key">outputformat</span>
+                  <code class="value">json | yaml | xml | csv | emmet</code>
+                </li>
+                <li>
+                  <span class="key">savetohistory</span>
+                  <code class="value">true | false</code>
+                </li>
+                <li>
+                  <span class="key">align</span>
+                  <code class="value">true | false</code>
+                </li>
+                <li>
+                  <span class="key">case</span>
+                  <code class="value">upper | camel | snake | none</code>
+                </li>
+              </ul>
+            </section>
+
+            <section class="help-section">
+              <h3>
+                <i class="fas fa-exchange-alt"></i> Замяна на тагове / стойности
+              </h3>
+
+              <ul class="help-list">
+                <li>
+                  <span class="key">replace.tag.<em>old</em></span>
+                  <code class="value">new</code>
+                </li>
+                <li>
+                  <span class="key">replace.val.<em>old</em></span>
+                  <code class="value">new</code>
+                </li>
+              </ul>
+            </section>
+
+            <section class="help-section">
+              <h3><i class="fas fa-lightbulb"></i> Примерна конфигурация</h3>
+              <pre class="help-example"><code>inputformat=yaml
+outputformat=json
+savetohistory=true
+align=true
+case=snake
+replace.tag.version=ver
+replace.val.1.0=latest</code></pre>
+            </section>
+          </article>
+        </div>
+      </main>
+      <footer class="app-footer"></footer>
+    </div>
+
+    <!-- Modal for login / registration -->
+    <div id="auth-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2 id="auth-title">Вход</h2>
+
+        <form id="auth-form">
+          <input type="email" name="email" placeholder="E-mail" required />
+          <input
+            type="password"
+            name="password"
+            placeholder="Парола"
+            required
+            minlength="6"
+          />
+          <button class="btn btn-primary" type="submit">OK</button>
+        </form>
+
+        <div class="auth-switch">
+          <span id="auth-help">Нямате акаунт?</span>
+          <a id="auth-switch-link" href="#">Регистрация</a>
+        </div>
+
+        <p class="auth-error hidden" id="auth-error"></p>
+      </div>
+    </div>
+
+    <!-- CSV parsing, core logic, UI handling, and authentication -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+    <script src="convert.js"></script>
+    <script src="script.js"></script>
+    <script src="auth.js"></script>
+
+    <!-- Toast notifications -->
+    <div id="toast-container"></div>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+<products>
+  <item>
+    <product>Laptop</product>
+    <price>999.99</price>
+    <stock>true</stock>
+  </item>
+  <item>
+    <product>Mouse</product>
+    <price>19.99</price>
+    <stock>false</stock>
+  </item>
+</products>

@@ -1,0 +1,12 @@
+[
+  {
+    "product": "Laptop",
+    "price": 999.99,
+    "stock": true
+  },
+  {
+    "product": "Mouse",
+    "price": 19.99,
+    "stock": false
+  }
+]
