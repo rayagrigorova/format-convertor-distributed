@@ -50,8 +50,21 @@ app.post("/rpc", async (req, res) => {
     }
 
     if (method === "convert") {
-      const inputString = params?.inputString ?? "";
-      const settingsString = params?.settingsString ?? "";
+      let inputString = params?.inputString ?? "";
+      let settingsString = params?.settingsString ?? "";
+
+      // Normalize Windows newlines + strip BOM (common copy/paste issue)
+      inputString = String(inputString).replace(/^\uFEFF/, "");
+      settingsString = String(settingsString)
+        .replace(/^\uFEFF/, "")
+        .replace(/\r\n/g, "\n");
+
+      console.log(
+        "FIRST CHAR CODE:",
+        inputString ? inputString.charCodeAt(0) : null
+      );
+      console.log("FIRST 30 CHARS:", JSON.stringify(inputString.slice(0, 30)));
+      console.log("SETTINGS RECEIVED:", JSON.stringify(settingsString));
 
       // In this project convert() returns { result, meta }.
       // We must return only the string result.
