@@ -23,6 +23,8 @@
  *   File input logic          -> handles loading from uploaded files
  */
 
+console.log("SCRIPT LOADED: " + new Date().toISOString());
+
 // Sample input & default settings
 const SAMPLE_JSON = `{
   "name": "John Doe",

@@ -29,7 +29,7 @@ app.use(express.json({ limit: "5mb" }));
  * POST /rpc
  * Body: { "jsonrpc":"2.0", "id":1, "method":"convert", "params":{...} }
  */
-app.post("/rpc", (req, res) => {
+app.post("/rpc", async (req, res) => {
   const { jsonrpc, id, method, params } = req.body || {};
 
   const reply = (result) => res.json({ jsonrpc: "2.0", id, result });
@@ -53,8 +53,17 @@ app.post("/rpc", (req, res) => {
       const inputString = params?.inputString ?? "";
       const settingsString = params?.settingsString ?? "";
 
-      const output = DataTransformer.convert(inputString, settingsString);
-      return reply({ output });
+      // In this project convert() returns { result, meta }.
+      // We must return only the string result.
+      const converted = await DataTransformer.convert(
+        inputString,
+        settingsString
+      );
+
+      const outputText =
+        typeof converted === "string" ? converted : converted?.result ?? "";
+
+      return reply({ output: outputText });
     }
 
     return error(-32601, "Method not found", { method });
