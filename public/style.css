@@ -856,3 +856,51 @@ input[type="file"] {
 .action-bar .btn-outline:hover {
   background-color: var(--gray-100);
 }
+
+/* Stats */
+.stats-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stats-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.stats-card-title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats-rows {
+  display: grid;
+  gap: 6px;
+  color: #374151;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #eef2f7;
+}
+
+.stats-row:last-child {
+  border-bottom: none;
+}
+
+.stats-key {
+  opacity: 0.85;
+}
+
+.stats-val {
+  font-weight: 600;
+}

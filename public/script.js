@@ -121,6 +121,11 @@ function detectFormatForValidation(
 const inputField = document.getElementById("input-field");
 const outputField = document.getElementById("output-field");
 
+async function fetchStats() {
+  const data = await api("stats_dotnet.php");
+  return data;
+}
+
 // Main app init function
 window.initApp = function initApp() {
   if (window._appInitialized) return;
@@ -137,6 +142,14 @@ window.initApp = function initApp() {
 
       tab.classList.add("active");
       tabContents[index].classList.add("active");
+
+      const activeId = tabContents[index]?.id;
+      if (
+        activeId === "stats-tab" &&
+        typeof window.renderStats === "function"
+      ) {
+        window.renderStats();
+      }
     });
   });
 
@@ -178,6 +191,18 @@ window.initApp = function initApp() {
   const transformBtn = document.getElementById("transform-btn");
   const historyContainer = document.getElementById("history-container");
   const validateBtn = document.getElementById("validate-btn");
+  const statsContainer = document.getElementById("stats-container");
+
+  function refreshStatsIfVisible() {
+    const statsTab = document.getElementById("stats-tab");
+    if (
+      statsTab &&
+      statsTab.classList.contains("active") &&
+      window.renderStats
+    ) {
+      window.renderStats();
+    }
+  }
 
   transformBtn.addEventListener("click", async () => {
     const input = inputField.value;
@@ -226,6 +251,8 @@ window.initApp = function initApp() {
       }
 
       outputField.value = result;
+
+      refreshStatsIfVisible();
     } catch (err) {
       outputField.value = "⚠️ Грешка при трансформация:\n" + err.message;
     } finally {
@@ -373,6 +400,97 @@ window.initApp = function initApp() {
       });
   }
 
+  function renderStats() {
+    if (!statsContainer) return;
+
+    statsContainer.innerHTML = '<div class="empty-state">Зареждане…</div>';
+
+    fetchStats()
+      .then((data) => {
+        if (!data || data.ok === false) {
+          const msg = data?.error || "Грешка при зареждане на статистиката.";
+          statsContainer.innerHTML = `<div class="empty-state">${msg}</div>`;
+          return;
+        }
+
+        const total = data.total ?? 0;
+
+        // .NET { key, count }
+        const byInputArr = Array.isArray(data.byInput) ? data.byInput : [];
+        const byOutputArr = Array.isArray(data.byOutput) ? data.byOutput : [];
+
+        // .NET byPair: [{ input, output, count }]
+        const byPairArr = Array.isArray(data.byPair) ? data.byPair : [];
+
+        statsContainer.innerHTML = "";
+
+        const makeCard = (title, rows) => {
+          const card = document.createElement("div");
+          card.className = "stats-card";
+
+          const header = document.createElement("div");
+          header.className = "stats-card-title";
+          header.textContent = title;
+
+          const body = document.createElement("div");
+          body.className = "stats-rows";
+
+          if (!rows.length) {
+            body.innerHTML = `<div class="empty-state">Няма данни.</div>`;
+          } else {
+            body.innerHTML = rows
+              .map(
+                (r) => `
+        <div class="stats-row">
+          <span class="stats-key">${r.key}</span>
+          <span class="stats-val">${r.val}</span>
+        </div>`
+              )
+              .join("");
+          }
+
+          card.appendChild(header);
+          card.appendChild(body);
+          return card;
+        };
+
+        statsContainer.appendChild(
+          makeCard("Общо трансформации", [{ key: "Общо", val: String(total) }])
+        );
+
+        const inputRows = byInputArr.map((r) => ({
+          key: r.key,
+          val: String(r.count),
+        }));
+
+        statsContainer.appendChild(makeCard("По входен формат", inputRows));
+
+        const outputRows = byOutputArr.map((r) => ({
+          key: r.key,
+          val: String(r.count),
+        }));
+
+        statsContainer.appendChild(makeCard("По изходен формат", outputRows));
+
+        if (byPairArr.length) {
+          const pairRows = byPairArr.map((p) => ({
+            key: `${p.input} → ${p.output}`,
+            val: String(p.count),
+          }));
+          statsContainer.appendChild(
+            makeCard("Най-чести трансформации", pairRows)
+          );
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        statsContainer.innerHTML =
+          '<div class="empty-state">Грешка при връзка към статистиката (.NET).</div>';
+      });
+  }
+
+  window.renderStats = renderStats;
+
   // Helper: shorten long preview strings
   function truncate(str) {
     return str.length > 80 ? str.substring(0, 77) + "..." : str;
@@ -403,6 +521,8 @@ window.initApp = function initApp() {
 
   window.renderHistory = renderHistory;
   renderHistory();
+
+  window.renderStats = renderStats;
 };
 
 // Show toast message (success or error)
@@ -473,6 +593,7 @@ document
 
       showToast("Успешно запазено в историята!");
       renderHistory(); // Refresh history panel
+      refreshStatsIfVisible();
     } catch (err) {
       showToast("Грешка при записа: " + err.message, "error");
     }
