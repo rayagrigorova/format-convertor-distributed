@@ -77,6 +77,46 @@ async function convertViaRpc(inputString, settingsStringWithoutEngine) {
   return data.output;
 }
 
+async function validateViaJava(format, text) {
+  const data = await api("validate_java.php", {
+    method: "POST",
+    body: JSON.stringify({ format, text }),
+  });
+
+  return data;
+}
+
+function detectFormatForValidation(
+  input,
+  manualSettings,
+  formatMode,
+  inputFormatSelect
+) {
+  if (formatMode === "dropdown") {
+    return (inputFormatSelect.value || "").trim().toLowerCase();
+  }
+
+  // manual mode
+  const inputFmt = (getSettingValue(manualSettings, "inputformat") || "")
+    .trim()
+    .toLowerCase();
+
+  if (inputFmt && inputFmt !== "auto") return inputFmt;
+
+  try {
+    if (
+      window.DataTransformer &&
+      typeof window.DataTransformer.detectFormat === "function"
+    ) {
+      const detected = window.DataTransformer.detectFormat(input);
+      return (detected || "").toLowerCase();
+    }
+  } catch (_) {}
+
+  // fallback
+  return "";
+}
+
 // Input/output fields
 const inputField = document.getElementById("input-field");
 const outputField = document.getElementById("output-field");
@@ -137,6 +177,7 @@ window.initApp = function initApp() {
   // Handle transform button click
   const transformBtn = document.getElementById("transform-btn");
   const historyContainer = document.getElementById("history-container");
+  const validateBtn = document.getElementById("validate-btn");
 
   transformBtn.addEventListener("click", async () => {
     const input = inputField.value;
@@ -211,6 +252,69 @@ window.initApp = function initApp() {
         .catch(() => {
           showToast("Неуспешен запис в историята.", "error");
         });
+    }
+  });
+
+  // Handle validate button click (Java REST validator)
+  validateBtn.addEventListener("click", async () => {
+    const input = inputField.value || "";
+    const formatMode = document.querySelector(
+      'input[name="format-mode"]:checked'
+    ).value;
+
+    const manualSettings =
+      formatMode === "manual" ? manualFormatField.value.trim() : "";
+
+    if (!input.trim()) {
+      showToast("Полето „Вход“ е празно.", "error");
+      return;
+    }
+
+    const fmt = detectFormatForValidation(
+      input,
+      manualSettings,
+      formatMode,
+      inputFormatSelect
+    );
+
+    if (!fmt) {
+      showToast(
+        "Не мога да определя входния формат за валидиране. Избери inputformat или dropdown.",
+        "error"
+      );
+      return;
+    }
+
+    const oldHtml = validateBtn.innerHTML;
+    validateBtn.innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> Валидиране...';
+    validateBtn.disabled = true;
+
+    try {
+      const res = await validateViaJava(fmt, input);
+
+      if (res.ok) {
+        showToast(`Валидацията беше успешна (${fmt.toUpperCase()})`, "success");
+      } else {
+        const errors = Array.isArray(res.errors)
+          ? res.errors
+          : ["Невалиден вход."];
+        showToast(
+          `Неуспешна валидация (${fmt.toUpperCase()}):<br>${errors
+            .map((e) => `• ${e}`)
+            .join("<br>")}`,
+          "error"
+        );
+      }
+    } catch (err) {
+      showToast(
+        "Грешка при връзка към Java валидатора (localhost:8082).",
+        "error"
+      );
+      console.error(err);
+    } finally {
+      validateBtn.innerHTML = oldHtml;
+      validateBtn.disabled = false;
     }
   });
 

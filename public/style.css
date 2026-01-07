@@ -846,3 +846,13 @@ input[type="file"] {
   color: var(--gray-700, #374151);
   font-family: "Inter", sans-serif;
 }
+
+.action-bar .btn-outline {
+  border: 1px solid var(--gray-300);
+  color: var(--primary);
+  background-color: white;
+}
+
+.action-bar .btn-outline:hover {
+  background-color: var(--gray-100);
+}
