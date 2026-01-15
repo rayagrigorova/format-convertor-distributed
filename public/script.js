@@ -23,6 +23,11 @@
  *   File input logic          -> handles loading from uploaded files
  */
 
+window.refreshStatsIfVisible = window.refreshStatsIfVisible || function () {};
+if (typeof refreshStatsIfVisible === "undefined") {
+  var refreshStatsIfVisible = window.refreshStatsIfVisible;
+}
+
 console.log("SCRIPT LOADED: " + new Date().toISOString());
 
 // Sample input & default settings
@@ -126,6 +131,15 @@ async function fetchStats() {
   return data;
 }
 
+function refreshStatsIfVisible() {
+  const statsTab = document.getElementById("stats-tab");
+  if (statsTab && statsTab.classList.contains("active") && window.renderStats) {
+    window.renderStats();
+  }
+}
+
+window.refreshStatsIfVisible = refreshStatsIfVisible;
+
 // Main app init function
 window.initApp = function initApp() {
   if (window._appInitialized) return;
@@ -193,17 +207,6 @@ window.initApp = function initApp() {
   const validateBtn = document.getElementById("validate-btn");
   const statsContainer = document.getElementById("stats-container");
 
-  function refreshStatsIfVisible() {
-    const statsTab = document.getElementById("stats-tab");
-    if (
-      statsTab &&
-      statsTab.classList.contains("active") &&
-      window.renderStats
-    ) {
-      window.renderStats();
-    }
-  }
-
   transformBtn.addEventListener("click", async () => {
     const input = inputField.value;
     const formatMode = document.querySelector(
@@ -252,7 +255,7 @@ window.initApp = function initApp() {
 
       outputField.value = result;
 
-      refreshStatsIfVisible();
+      window.refreshStatsIfVisible?.();
     } catch (err) {
       outputField.value = "⚠️ Грешка при трансформация:\n" + err.message;
     } finally {
@@ -592,8 +595,10 @@ document
       });
 
       showToast("Успешно запазено в историята!");
-      renderHistory(); // Refresh history panel
-      refreshStatsIfVisible();
+      // renderHistory(); // Refresh history panel
+      // refreshStatsIfVisible();
+      window.renderHistory?.();
+      window.refreshStatsIfVisible?.();
     } catch (err) {
       showToast("Грешка при записа: " + err.message, "error");
     }

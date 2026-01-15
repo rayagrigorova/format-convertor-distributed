@@ -190,9 +190,6 @@
 
           <!-- Action buttons: reset, save, transform -->
           <div class="action-bar">
-            <button class="btn btn-outline">
-              <i class="fas fa-redo"></i> Нулиране
-            </button>
             <button
               id="save-history-btn"
               class="btn btn-primary btn-lg"
@@ -222,84 +219,81 @@
           <div class="stats-panel" id="stats-container">
             <div class="empty-state">Няма заредена статистика.</div>
           </div>
+        </div>
 
-          <!-- Help / Settings reference -->
-          <div class="tab-content" id="help-tab">
-            <article class="help-panel">
-              <header class="help-header">
-                <i class="fas fa-question-circle"></i>
-                <h2>Помощ / Настройки на трансформацията</h2>
-              </header>
-              <!-- Quick overview, options, replacements, example configuration -->
-              <section class="help-section">
-                <h3><i class="fas fa-info-circle"></i> Как работи</h3>
-                <p>
-                  Полето <strong>Настройки</strong> (key=value) ви дава пълен
-                  контрол върху преобразуването – формат, подравняване,
-                  преименуване на тагове и др. Най-честите параметри са събрани
-                  в таблицата по-долу.
-                </p>
-              </section>
+        <!-- Help / Settings reference -->
+        <div class="tab-content" id="help-tab">
+          <article class="help-panel">
+            <header class="help-header">
+              <i class="fas fa-question-circle"></i>
+              <h2>Помощ / Настройки на трансформацията</h2>
+            </header>
 
-              <section class="help-section">
-                <h3><i class="fas fa-sliders-h"></i> Основни опции</h3>
+            <section class="help-section">
+              <h3><i class="fas fa-info-circle"></i> Как работи</h3>
+              <p>
+                Полето <strong>Настройки</strong> (key=value) ви дава пълен
+                контрол върху преобразуването – формат, подравняване,
+                преименуване на тагове и др. Най-честите параметри са събрани в
+                таблицата по-долу.
+              </p>
+            </section>
 
-                <ul class="help-list">
-                  <li>
-                    <span class="key">inputformat</span>
-                    <code class="value"
-                      >json | yaml | xml | csv | emmet | auto</code
-                    >
-                  </li>
-                  <li>
-                    <span class="key">outputformat</span>
-                    <code class="value">json | yaml | xml | csv | emmet</code>
-                  </li>
-                  <li>
-                    <span class="key">savetohistory</span>
-                    <code class="value">true | false</code>
-                  </li>
-                  <li>
-                    <span class="key">align</span>
-                    <code class="value">true | false</code>
-                  </li>
-                  <li>
-                    <span class="key">case</span>
-                    <code class="value">upper | camel | snake | none</code>
-                  </li>
-                </ul>
-              </section>
+            <section class="help-section">
+              <h3><i class="fas fa-sliders-h"></i> Основни опции</h3>
+              <ul class="help-list">
+                <li>
+                  <span class="key">inputformat</span>
+                  <code class="value"
+                    >json | yaml | xml | csv | emmet | auto</code
+                  >
+                </li>
+                <li>
+                  <span class="key">outputformat</span>
+                  <code class="value">json | yaml | xml | csv | emmet</code>
+                </li>
+                <li>
+                  <span class="key">savetohistory</span>
+                  <code class="value">true | false</code>
+                </li>
+                <li>
+                  <span class="key">align</span>
+                  <code class="value">true | false</code>
+                </li>
+                <li>
+                  <span class="key">case</span>
+                  <code class="value">upper | camel | snake | none</code>
+                </li>
+              </ul>
+            </section>
 
-              <section class="help-section">
-                <h3>
-                  <i class="fas fa-exchange-alt"></i> Замяна на тагове /
-                  стойности
-                </h3>
+            <section class="help-section">
+              <h3>
+                <i class="fas fa-exchange-alt"></i> Замяна на тагове / стойности
+              </h3>
+              <ul class="help-list">
+                <li>
+                  <span class="key">replace.tag.<em>old</em></span>
+                  <code class="value">new</code>
+                </li>
+                <li>
+                  <span class="key">replace.val.<em>old</em></span>
+                  <code class="value">new</code>
+                </li>
+              </ul>
+            </section>
 
-                <ul class="help-list">
-                  <li>
-                    <span class="key">replace.tag.<em>old</em></span>
-                    <code class="value">new</code>
-                  </li>
-                  <li>
-                    <span class="key">replace.val.<em>old</em></span>
-                    <code class="value">new</code>
-                  </li>
-                </ul>
-              </section>
-
-              <section class="help-section">
-                <h3><i class="fas fa-lightbulb"></i> Примерна конфигурация</h3>
-                <pre class="help-example"><code>inputformat=yaml
+            <section class="help-section">
+              <h3><i class="fas fa-lightbulb"></i> Примерна конфигурация</h3>
+              <pre class="help-example"><code>inputformat=yaml
 outputformat=json
 savetohistory=true
 align=true
 case=snake
 replace.tag.version=ver
 replace.val.1.0=latest</code></pre>
-              </section>
-            </article>
-          </div>
+            </section>
+          </article>
         </div>
       </main>
       <footer class="app-footer"></footer>
