@@ -1,0 +1,26 @@
+ / Editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- Java (Maven) ---
+target/
+
+# --- .NET ---
+bin/
+obj/
+.vs/
+
+# --- Jest / tests ---
+__tests__/
+coverage/
+jest.config.*
+*.test.js
+*.spec.js
