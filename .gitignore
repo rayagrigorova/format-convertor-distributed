@@ -24,3 +24,10 @@ coverage/
 jest.config.*
 *.test.js
 *.spec.js
+
+node_modules/
+bin/
+obj/
+target/
+coverage/
+
