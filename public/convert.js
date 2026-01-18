@@ -333,7 +333,7 @@
         obj[term.name] = term.value.map((v) =>
           typeof v === "string" || typeof v === "number"
             ? coerce(v)
-            : flatten(v)
+            : flatten(v),
         );
         return obj;
       }
@@ -494,7 +494,7 @@
     // Dynamically load the js-yaml library if not already loaded
     const jsYaml = await lazyLoad(
       "https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js",
-      "jsyaml"
+      "jsyaml",
     );
 
     // Dump the object into YAML format with readable formatting
@@ -512,7 +512,7 @@
   async function yamlToJSON(text) {
     const jsYaml = await lazyLoad(
       "https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js",
-      "jsyaml"
+      "jsyaml",
     );
     // Parse YAML into a JS object
     return jsYaml.load(text);
@@ -693,7 +693,7 @@
             ? `"${String(cell).replace(/"/g, '""')}"`
             : cell;
         })
-        .join(",")
+        .join(","),
     );
     return header + "\n" + rows.join("\n");
   }
@@ -728,7 +728,7 @@
     if (Array.isArray(obj)) return obj.map((v) => transformKeys(v, fn));
     if (!isObject(obj)) return obj;
     return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [fn(k), transformKeys(v, fn)])
+      Object.entries(obj).map(([k, v]) => [fn(k), transformKeys(v, fn)]),
     );
   }
 
@@ -745,14 +745,14 @@
           Object.entries(node).map(([k, v]) => {
             const nk = opts.replace.tag[k] || k;
             return [nk, walk(v)];
-          })
+          }),
         );
       }
 
       // Replace primitive value if match exists
       return Object.prototype.hasOwnProperty.call(
         opts.replace.val,
-        String(node)
+        String(node),
       )
         ? opts.replace.val[String(node)]
         : node;
@@ -778,7 +778,7 @@
 
     if (inFmt === "unknown")
       throw Error(
-        "Не може да се определи входният формат и не е зададен ръчно."
+        "Не може да се определи входният формат и не е зададен ръчно.",
       );
 
     // Check if any transformation is needed (case or replacements)

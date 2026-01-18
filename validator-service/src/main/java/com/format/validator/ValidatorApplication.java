@@ -20,7 +20,7 @@ public class ValidatorApplication {
   }
 
   @RestController
-  @CrossOrigin(origins = "*") // OK за localhost dev
+  @CrossOrigin(origins = "*")
   public static class ValidateController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -126,7 +126,6 @@ public class ValidatorApplication {
       return errors;
     }
 
-    // Минимална Emmet проверка (лека, но достатъчна)
     private List<String> validateEmmet(String text) {
       String t = safeTrim(text);
       if (t.isEmpty()) return List.of("Emmet: празен вход.");
@@ -182,7 +181,6 @@ public class ValidatorApplication {
       }
     }
 
-    // минимален CSV split, пази кавички
     private List<String> splitCsvLine(String line) {
       List<String> out = new ArrayList<>();
       StringBuilder cur = new StringBuilder();

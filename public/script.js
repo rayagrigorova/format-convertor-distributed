@@ -95,7 +95,7 @@ function detectFormatForValidation(
   input,
   manualSettings,
   formatMode,
-  inputFormatSelect
+  inputFormatSelect,
 ) {
   if (formatMode === "dropdown") {
     return (inputFormatSelect.value || "").trim().toLowerCase();
@@ -169,16 +169,16 @@ window.initApp = function initApp() {
 
   // Format mode (manual vs dropdown)
   const formatModeRadios = document.querySelectorAll(
-    'input[name="format-mode"]'
+    'input[name="format-mode"]',
   );
   const manualFormatContainer = document.getElementById(
-    "manual-format-container"
+    "manual-format-container",
   );
   const manualFormatField = document.getElementById("manual-format-field");
   const inputFormatSelect = document.getElementById("input-format-select");
   const outputFormatSelect = document.getElementById("output-format-select");
   const dropdownFormatsContainer = document.getElementById(
-    "dropdown-formats-container"
+    "dropdown-formats-container",
   );
 
   // Toggle format mode display
@@ -210,7 +210,7 @@ window.initApp = function initApp() {
   transformBtn.addEventListener("click", async () => {
     const input = inputField.value;
     const formatMode = document.querySelector(
-      'input[name="format-mode"]:checked'
+      'input[name="format-mode"]:checked',
     ).value;
 
     // Build settings string
@@ -234,12 +234,11 @@ window.initApp = function initApp() {
       const engine = (
         getSettingValue(settingsString, "engine") || "local"
       ).toLowerCase();
-      const transformerSettings = stripEngineSetting(settingsString); // <- ВАЖНО
+      const transformerSettings = stripEngineSetting(settingsString);
 
       if (engine === "rpc") {
         result = await convertViaRpc(input, transformerSettings);
 
-        // meta е нужно за save/history – извличаме го от settings
         const inMatch = transformerSettings.match(/inputformat=(\w+)/i);
         const outMatch = transformerSettings.match(/outputformat=(\w+)/i);
         meta = {
@@ -249,7 +248,7 @@ window.initApp = function initApp() {
       } else {
         ({ result, meta } = await DataTransformer.convert(
           input,
-          transformerSettings
+          transformerSettings,
         ));
       }
 
@@ -289,7 +288,7 @@ window.initApp = function initApp() {
   validateBtn.addEventListener("click", async () => {
     const input = inputField.value || "";
     const formatMode = document.querySelector(
-      'input[name="format-mode"]:checked'
+      'input[name="format-mode"]:checked',
     ).value;
 
     const manualSettings =
@@ -304,13 +303,13 @@ window.initApp = function initApp() {
       input,
       manualSettings,
       formatMode,
-      inputFormatSelect
+      inputFormatSelect,
     );
 
     if (!fmt) {
       showToast(
         "Не мога да определя входния формат за валидиране. Избери inputformat или dropdown.",
-        "error"
+        "error",
       );
       return;
     }
@@ -333,13 +332,13 @@ window.initApp = function initApp() {
           `Неуспешна валидация (${fmt.toUpperCase()}):<br>${errors
             .map((e) => `• ${e}`)
             .join("<br>")}`,
-          "error"
+          "error",
         );
       }
     } catch (err) {
       showToast(
         "Грешка при връзка към Java валидатора (localhost:8082).",
-        "error"
+        "error",
       );
       console.error(err);
     } finally {
@@ -372,7 +371,7 @@ window.initApp = function initApp() {
           wrapper.innerHTML = `
           <div class="history-item-header">
             <div class="history-item-title">${getFormatLabel(
-              entry.settings
+              entry.settings,
             )}</div>
             <div class="history-item-time">${ts}</div>
           </div>
@@ -447,7 +446,7 @@ window.initApp = function initApp() {
         <div class="stats-row">
           <span class="stats-key">${r.key}</span>
           <span class="stats-val">${r.val}</span>
-        </div>`
+        </div>`,
               )
               .join("");
           }
@@ -458,7 +457,7 @@ window.initApp = function initApp() {
         };
 
         statsContainer.appendChild(
-          makeCard("Общо трансформации", [{ key: "Общо", val: String(total) }])
+          makeCard("Общо трансформации", [{ key: "Общо", val: String(total) }]),
         );
 
         const inputRows = byInputArr.map((r) => ({
@@ -481,7 +480,7 @@ window.initApp = function initApp() {
             val: String(p.count),
           }));
           statsContainer.appendChild(
-            makeCard("Най-чести трансформации", pairRows)
+            makeCard("Най-чести трансформации", pairRows),
           );
         }
       })
@@ -595,8 +594,6 @@ document
       });
 
       showToast("Успешно запазено в историята!");
-      // renderHistory(); // Refresh history panel
-      // refreshStatsIfVisible();
       window.renderHistory?.();
       window.refreshStatsIfVisible?.();
     } catch (err) {
@@ -634,9 +631,8 @@ fileUpload.addEventListener("change", async (e) => {
     const text = await file.text();
     inputField.value = text;
     fileInfo.style.display = "flex";
-    document.getElementById(
-      "file-name"
-    ).textContent = `Качен файл: ${file.name}`;
+    document.getElementById("file-name").textContent =
+      `Качен файл: ${file.name}`;
     showToast(`Файлът „${file.name}“ беше зареден успешно.`);
   } catch (err) {
     showToast("Грешка при зареждане на файла.", "error");

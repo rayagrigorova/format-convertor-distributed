@@ -2,33 +2,22 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-// Polyfills for convert.js (XML in Node)
 const { DOMParser, XMLSerializer } = require("@xmldom/xmldom");
 global.DOMParser = DOMParser;
 global.XMLSerializer = XMLSerializer;
 
-// If your convert.js expects Papa global for CSV:
 global.Papa = require("papaparse");
 
-// If your convert.js dynamically loads js-yaml in browser,
-// in Node it's ok to have it available:
 global.jsyaml = require("js-yaml");
 
-// Import the same converter you use in the browser:
-const DataTransformer = require(path.join(
-  __dirname,
-  "../../public/convert.js"
-));
+const DataTransformer = require(
+  path.join(__dirname, "../../public/convert.js"),
+);
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: "5mb" }));
 
-/**
- * Minimal JSON-RPC 2.0 endpoint
- * POST /rpc
- * Body: { "jsonrpc":"2.0", "id":1, "method":"convert", "params":{...} }
- */
 app.post("/rpc", async (req, res) => {
   const { jsonrpc, id, method, params } = req.body || {};
 
@@ -55,35 +44,35 @@ app.post("/rpc", async (req, res) => {
 
       console.log(
         "FIRST CHAR CODE (raw):",
-        String(params?.inputString ?? "").charCodeAt(0)
+        String(params?.inputString ?? "").charCodeAt(0),
       );
 
       // Normalize + remove invisible chars that break XML detection/parsing
       const clean = (s) =>
         String(s || "")
           .replace(/\r\n/g, "\n")
-          .replace(/[\uFEFF\u200B\u00A0]/g, "") // BOM, zero-width, NBSP anywhere
-          .trimStart(); // important: make '<' be first visible char
+          .replace(/[\uFEFF\u200B\u00A0]/g, "")
+          .trimStart();
 
       inputString = clean(inputString);
       settingsString = clean(settingsString);
 
       console.log(
         "FIRST CHAR CODE:",
-        inputString ? inputString.charCodeAt(0) : null
+        inputString ? inputString.charCodeAt(0) : null,
       );
       console.log("FIRST 30 CHARS:", JSON.stringify(inputString.slice(0, 30)));
       console.log("SETTINGS RECEIVED:", JSON.stringify(settingsString));
 
-      // In this project convert() returns { result, meta }.
-      // We must return only the string result.
+      // In this project convert() returns { result, meta }
+      // We must return only the string result
       const converted = await DataTransformer.convert(
         inputString,
-        settingsString
+        settingsString,
       );
 
       const outputText =
-        typeof converted === "string" ? converted : converted?.result ?? "";
+        typeof converted === "string" ? converted : (converted?.result ?? "");
 
       return reply({ output: outputText });
     }

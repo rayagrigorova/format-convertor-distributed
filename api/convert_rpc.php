@@ -68,7 +68,7 @@ if (!isset($rpc['result']['output'])) {
 
 echo json_encode([
   "ok" => true,
-  "debug_rpc" => $rpc,  // <-- временно за дебъг
+  "debug_rpc" => $rpc,
   "output" => $rpc['result']['output']
 ]);
 exit;
